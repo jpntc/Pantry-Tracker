@@ -1,11 +1,9 @@
-import React from 'react'
-
+"use client";
+import React from "react";
 const AnalyticsPane = () => {
   return (
-    <div>
-        
-    </div>
-  )
-}
+  <section>HELLO WORLD</section>
+  );
+};
 
-export default AnalyticsPane
+export default AnalyticsPane;
