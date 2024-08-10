@@ -31,6 +31,7 @@ export async function POST(req) {
         });
       }
       if (parsedInput) {
+        console.log(parsedInput)
         try {
           const operation = {
             method: "POST",
@@ -74,7 +75,7 @@ const makeOpenAIRequest = async (request) => {
         {
           role: "system",
           content:
-            "You will convert the following prompt to a simple command which will contain the command of what the user is trying to do ( either add delete search or update) and the item to do the command on. Return it as a valid json string, with keys being 0,1,2. 0 will contain the command, 1 the value or amount to work with (if its spelled out put it as a number), and 2 the item the user is requesting us to operate with, if the prompt doesnt have a quantity just put an empty string, make sure to return a valid json string.",
+            "You will convert the following prompt to a simple command which will contain the command of what the user is trying to do ( either add delete search or update) and the item to do the command on. Return only a valid json string and nothing else, with keys being 0,1,2. 0 will contain the command, 1 the value or amount to work with (if its spelled out put it as a number), and 2 the item the user is requesting us to operate with, if the prompt doesnt have a quantity just put an empty string, make sure to return a valid json string.",
         },
         {
           role: "user",
