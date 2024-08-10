@@ -29,19 +29,24 @@ const ManagementPane = () => {
       console.log("before fetching");
       const response = await fetch(endpoint, options);
       console.log("Successful API route calls and return to management tab.");
+      console.log(response.status)
       if (response) {
         if (response.status === 200) {
+          console.log("response status is ok")
           const result = await response.json();
-          if(result.error){
-            setResponseMessage(result.error)
+          console.log("result", result)
+          if(result.errorSearch){
+            setResponseMessage(result.errorSearch)
             return;
           }
-                    if (result.results.searched === "searched") {
-                      setSearchedData(result.results);
-                      setSearched(true);
-                      return;
-                    }
-          const inventoryArray = result.results.inventory;
+          if (result.searched == "searched") {
+    
+            setSearchedData(result);
+            console.log(searchedData)
+            setSearched(true);
+            return;
+          }
+          const inventoryArray = result.inventory;
           setInventory(inventoryArray);
           console.log("inventory", inventory);
         } else {
@@ -122,7 +127,6 @@ const ManagementPane = () => {
             <div className="flex flex-row justify-between items-center h-full">
               <div className="font-bold">{searchedData.name}</div>
               <div>{searchedData.quantity}</div>
-              {console.log(searchedData)}
             </div>
           </div>
         </div>

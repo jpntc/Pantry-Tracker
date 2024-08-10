@@ -144,9 +144,9 @@ const searchItem = async (item) =>{
       let {quantity} = docSnap.data()
       let name = docSnap.id
       console.log(name, quantity)
-      return {"searched":"searched","name": name, "quantity": quantity}
+      return {searched:"searched", name: name, quantity: quantity, status: 200}
     }else{
-      return {error:"No such item in your inventory.", status: 200}
+      return {errorSearch:"No such item in your inventory.", status: 200}
     }
   }
   catch(error){

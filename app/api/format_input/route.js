@@ -38,7 +38,7 @@ export async function POST(req) {
             body: JSON.stringify({ data: parsedInput }),
           };
           const endpoint = "http://localhost:3000/api/firebase_ops/";
-          const data= await fetch(endpoint, operation);
+          const data = await fetch(endpoint, operation);
           const results = await data.json()
 
           if(results){
@@ -46,7 +46,7 @@ export async function POST(req) {
           return NextResponse.json(results)
           }
         } catch (error) {
-          console.log("Failed to do fetch request on 2nd option", error)
+          console.log("An error occurred when making a request to firebase_ops", error)
           return NextResponse.json({ err: error });
         }
       }
