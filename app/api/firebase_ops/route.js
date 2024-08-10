@@ -49,8 +49,8 @@ export async function POST(request, response) {
       }
     } else if (body.data[0] == "search") {
       try {
-        let inventory = await searchItem(item)
-        return NextResponse.json(inventory);
+        let searchResults = await searchItem(item)
+        return NextResponse.json(searchResults);
       } catch (error) {
         return NextResponse.json({error});
       }
@@ -146,7 +146,7 @@ const searchItem = async (item) =>{
       console.log(name, quantity)
       return {"searched":"searched","name": name, "quantity": quantity}
     }else{
-      return "No such item in your inventory."
+      return {error:"No such item in your inventory.", status: 200}
     }
   }
   catch(error){
@@ -155,7 +155,7 @@ const searchItem = async (item) =>{
 }
 
 
-export async function GET() {
+export async function GET(req, res) {
   try{
   const inventory = await getInventory()
   
@@ -166,9 +166,4 @@ export async function GET() {
   }catch(error){
     return NextResponse.json("Error: There was a problem retrieving your inventory.")
   }
-
-
-
-
-
 }

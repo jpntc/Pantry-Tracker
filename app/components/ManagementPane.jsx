@@ -29,16 +29,19 @@ const ManagementPane = () => {
       console.log("before fetching");
       const response = await fetch(endpoint, options);
       console.log("Successful API route calls and return to management tab.");
-
       if (response) {
         if (response.status === 200) {
           const result = await response.json();
-          const inventoryArray = result.results.inventory;
-          if (result.results.searched === "searched") {
-            setSearchedData(result.results);
-            setSearched(true);
+          if(result.error){
+            setResponseMessage(result.error)
             return;
           }
+                    if (result.results.searched === "searched") {
+                      setSearchedData(result.results);
+                      setSearched(true);
+                      return;
+                    }
+          const inventoryArray = result.results.inventory;
           setInventory(inventoryArray);
           console.log("inventory", inventory);
         } else {
@@ -52,7 +55,7 @@ const ManagementPane = () => {
     }
   };
 
-  const onClose = () => setSearched(false);
+  const onClose = () =>{ setSearched(false); setResponseMessage("")};
 
   const loadInventory = async () => {
     const options = {
@@ -120,6 +123,21 @@ const ManagementPane = () => {
               <div className="font-bold">{searchedData.name}</div>
               <div>{searchedData.quantity}</div>
               {console.log(searchedData)}
+            </div>
+          </div>
+        </div>
+      )}
+      {responseMessage && (
+        <div className="flex fixed inset-0 items-center bg-slate-800 bg-opacity-50 justify-center z-10">
+          <div className="w-3/4 md:w-1/2 h-64 bg-white flex flex-col justify-between border border-red-300 text-lg md:text-xl rounded-xl p-4">
+            <button
+              className="self-end text-gray-600 hover:text-gray-900 text-2xl"
+              onClick={onClose}
+            >
+              &times;
+            </button>
+            <div className="flex flex-row justify-center items-center h-full">
+              <div className="font-bold">{responseMessage}</div>
             </div>
           </div>
         </div>

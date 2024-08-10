@@ -40,8 +40,11 @@ export async function POST(req) {
           const endpoint = "http://localhost:3000/api/firebase_ops/";
           const data= await fetch(endpoint, operation);
           const results = await data.json()
+
+          if(results){
           console.log(results)
-          return NextResponse.json({results})
+          return NextResponse.json(results)
+          }
         } catch (error) {
           console.log("Failed to do fetch request on 2nd option", error)
           return NextResponse.json({ err: error });
