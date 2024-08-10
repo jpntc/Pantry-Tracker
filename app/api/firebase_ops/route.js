@@ -13,7 +13,6 @@ import {
 export async function POST(request, response) {
   const body = await request.json();
 
-  console.log("hello world");
   console.log("firebase", body.data[0]);
   if (!body) {
     return NextResponse.json({ error: "No data provided" });
@@ -33,31 +32,27 @@ export async function POST(request, response) {
     item = body.data[2];
   } catch (error) {}
   try {
-    console.log(body.data[0]);
     console.log(quantity);
     if (body.data[0] == "add") {
       try {
         let inventory = await addItem(quantity, item);
-        console.log(inventory);
         return NextResponse.json({ inventory });
       } catch (error) {
         return NextResponse.json({ err: "Error adding your item" });
       }
-    } else if (body.request[0] == "delete") {
+    } else if (body.data[0] == "delete") {
       try {
         let inventory = await removeItem(quantity, item);
-        console.log(inventory);
-
         return NextResponse.json({ inventory });
       } catch (error) {
         return NextResponse.json({ err: "Error adding your item", error });
       }
-    } else if (body.request[0] == "search") {
+    } else if (body.data[0] == "search") {
       try {
-        inventory = await removeItem(quantity, item);
-        return NextResponse.json({ inventory });
+        let inventory = await searchItem(item)
+        return NextResponse.json(inventory);
       } catch (error) {
-        return NextResponse.json({ err: "Error adding your item", error });
+        return NextResponse.json({error});
       }
     }
   } catch (error) {
@@ -65,7 +60,7 @@ export async function POST(request, response) {
   }
 }
 
-const updateInventory = async () => {
+const getInventory = async () => {
   try {
     const snapshot = query(collection(firestore, "inventory"));
     const docs = await getDocs(snapshot);
@@ -80,14 +75,12 @@ const updateInventory = async () => {
 };
 
 const addItem = async (quant, item) => {
-  console.log("inside addItem");
   try {
     const docRef = doc(collection(firestore, "inventory"), item);
     const docSnap = await getDoc(docRef);
-    console.log("successfully got docs");
     if (docSnap.exists()) {
       const { quantity } = docSnap.data();
-      await setDoc(docRef, { quantity: quantity + 1 });
+      await setDoc(docRef, { quantity: quantity + quant});
     } else {
       if (quant) {
         await setDoc(docRef, { quantity: quant });
@@ -96,11 +89,10 @@ const addItem = async (quant, item) => {
       }
     }
   } catch (error) {
-    console.log(error);
     throw new error("Error adding item to your inventory");
   }
   try {
-    let inventory = await updateInventory();
+    let inventory = await getInventory();
     return inventory;
   } catch (error) {
     console.log("Error updating inventory");
@@ -115,21 +107,27 @@ const removeItem = async (quant, item) => {
   try {
     const docRef = doc(collection(firestore, "inventory"), item);
     const docSnap = await getDoc(docRef);
-    console.log("Got docSnap")
     if (docSnap.exists()) {
       const { quantity } = docSnap.data();
-      if (quantity === 1) {
+      if (quantity == 1) {
         await deleteDoc(docRef);
-      } else {
-        await setDoc(docRef, { quantity: quantity - quant });
+      } else if(! quant){
+        await setDoc(docRef, { quantity: quantity - 1 });
       }
+      else{
+        if (quantity - quant < 0) {
+          return "Error, the number of items you want to remove is less than the number of items in inventory."
+        }
+        await setDoc(docRef, {quantity: quantity - quant})
+      }
+    }else{
+      return "The item does not exist in inventory."
     }
-    console.log("Successfully removed item.")
   } catch (error) {
-    console.log("Error");
+    return "An error occurred when trying to remove the item."
   }
   try{
-    let inventory = await updateInventory();
+    let inventory = await getInventory();
     return inventory;
   } catch (error) {
     console.log("Error updating inventory");
@@ -137,3 +135,40 @@ const removeItem = async (quant, item) => {
   }
   return { error: "Error deleting item" };
 };
+
+const searchItem = async (item) =>{
+  try{
+    const docRef = doc(collection(firestore, "inventory"), item);
+    const docSnap = await getDoc(docRef);
+    if (docSnap.exists()) {
+      let {quantity} = docSnap.data()
+      let name = docSnap.id
+      console.log(name, quantity)
+      return {"searched":"searched","name": name, "quantity": quantity}
+    }else{
+      return "No such item in your inventory."
+    }
+  }
+  catch(error){
+    return "An error occurred when scanning your inventory."
+  }
+}
+
+
+export async function GET() {
+  try{
+  const inventory = await getInventory()
+  
+  if(inventory){
+    console.log(inventory)
+    return NextResponse.json({inventory})
+  }
+  }catch(error){
+    return NextResponse.json("Error: There was a problem retrieving your inventory.")
+  }
+
+
+
+
+
+}

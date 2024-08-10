@@ -14,7 +14,7 @@ export default function Home() {
     setCurrentWindow(window)
   }
   return (
-    <main className="flex min-h-screen p-24">
+    <main className="flex min-h-screen p-24 bg-gradient-to-b from-blue-200 via-green-100 to-cyan-200 ">
       <Navbar handleButtonPress={handleWindowChange} />
       <div className="w-full  h-content flex flex-col mt-16  ">
         {currentWindow === "Analytics" && (

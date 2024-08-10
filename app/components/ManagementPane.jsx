@@ -1,7 +1,6 @@
-"use client"
-import { stringify } from 'postcss'
-import React, {useState, useEffect} from 'react'
-import {firestore} from "@/firebase"
+"use client";
+import React, { useState, useEffect } from "react";
+import { firestore } from "@/firebase";
 import {
   collection,
   doc,
@@ -12,55 +11,74 @@ import {
   getDoc,
 } from "firebase/firestore";
 
-
 const ManagementPane = () => {
-  const [data, setData] = useState(null)
-  const [responseMessage, setResponseMessage] = useState("")
+  const [responseMessage, setResponseMessage] = useState("");
+  const [searchedData, setSearchedData] = useState({});
+  const [searched, setSearched] = useState(false);
   const [inventory, setInventory] = useState([]);
-  
 
-  const handleSubmit = async(input)=>{
-    input.preventDefault()
-    try{
+  const handleSubmit = async (input) => {
+    input.preventDefault();
+    try {
       const options = {
         method: "POST",
-        headers: {'Content-Type' : 'application/json'},
-        body: JSON.stringify({data: input.target.request.value})
-      }
-      const endpoint = "/api/format_input/"
-      const response = await fetch(endpoint, options)
- 
-      if(response){
-        if(response.status === 200){
-          const result = await response.json()
-          console.log(result);
-          setInventory[result]
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ data: input.target.request.value }),
+      };
+      const endpoint = "/api/format_input/";
+      console.log("before fetching");
+      const response = await fetch(endpoint, options);
+      console.log("Successful API route calls and return to management tab.");
 
-           
-        }else{
-          console.log(response)
-          console.log("Error in processing this command", response.status)
-          console.log(response.message)
+      if (response) {
+        if (response.status === 200) {
+          const result = await response.json();
+          const inventoryArray = result.results.inventory;
+          if (result.results.searched === "searched") {
+            setSearchedData(result.results);
+            setSearched(true);
+            return;
+          }
+          setInventory(inventoryArray);
+          console.log("inventory", inventory);
+        } else {
+          console.log(response);
+          console.log("Error in processing this command", response.status);
+          console.log(response.message);
         }
       }
-    }catch (error){
-      console.log(error)
-    } 
-  }
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
- 
+  const onClose = () => setSearched(false);
 
+  const loadInventory = async () => {
+    const options = {
+      method: "GET",
+      headers: { "Content-Type": "application/json" },
+    };
+    const endpoint = "/api/firebase_ops/";
 
-const handleOpen = () => setOpen(true);
-const handleClose = () => setOpen(false);
+    const inventory = await fetch(endpoint, options);
+    const inventoryArr = await inventory.json();
+    console.log(inventoryArr)
+    if (inventory) {
+      setInventory(inventoryArr.inventory);
+    }
+  };
+         useEffect(() => {
+           loadInventory();
+         }, []);
   return (
     <section className="w-full h-full">
-      <p className="font-bold text-lg md:text-2xl text-center">
+      <p className="font-bold text-lg md:text-2xl text-center text-white">
         Manage Inventory
       </p>
-      <div className="flex flex-col mt-4 w-full h-full ">
-        <div className="">
-          <form className="flex" onSubmit={handleSubmit}>
+      <div className="flex flex-col mt-4 w-full h-full md:p-24 justify-center content-center">
+        <div>
+          <form className="flex " onSubmit={handleSubmit}>
             <input
               name="request"
               type="text"
@@ -74,16 +92,40 @@ const handleClose = () => setOpen(false);
             />
           </form>
         </div>
-        <div className=" mt-4 flex flex-col w-full h-full border border-red-300 overflow-x-auto p-2">
-          {
-           inventory.map((item,index)=>{
-            <div className="w-full p-2 text-base font-bold" key={index}>{item}</div>
-           }) 
-          }
+
+        <div className="flex w-full justify-center">
+          <div className="mt-4 flex flex-col w-full md:w-2/3 h-96 border-4 border-orange-300  rounded-b-md overflow-y-auto">
+            {inventory.map((item, index) => (
+              <div
+                className="bg-white flex p-2 h-28 justify-between text-lg md:text-xl border border-black"
+                key={index}
+              >
+                <div className="font-bold content-center">{item.name}</div>
+                <div className="content-center">{item.quantity}</div>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
+      {searched && (
+        <div className="flex fixed inset-0 items-center bg-slate-800 bg-opacity-50 justify-center z-10">
+          <div className="w-3/4 md:w-1/2 h-64 bg-white flex flex-col justify-between border border-red-300 text-lg md:text-xl rounded-xl p-4">
+            <button
+              className="self-end text-gray-600 hover:text-gray-900 text-2xl"
+              onClick={onClose}
+            >
+              &times;
+            </button>
+            <div className="flex flex-row justify-between items-center h-full">
+              <div className="font-bold">{searchedData.name}</div>
+              <div>{searchedData.quantity}</div>
+              {console.log(searchedData)}
+            </div>
+          </div>
+        </div>
+      )}
     </section>
   );
-}
+};
 
-export default ManagementPane
+export default ManagementPane;

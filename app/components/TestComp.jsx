@@ -52,9 +52,6 @@ const TestComp = () => {
       setInventory(inventoryList);
     };
 
-    useEffect(() => {
-      updateInventory();
-    }, []);
 
 
     const addItem = async (item) => {

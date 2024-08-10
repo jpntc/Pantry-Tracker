@@ -37,12 +37,11 @@ export async function POST(req) {
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ data: parsedInput }),
           };
-
           const endpoint = "http://localhost:3000/api/firebase_ops/";
-          const userInventory = await fetch(endpoint, operation);
-          const inventoryData = await userInventory.json();
-          console.log(inventoryData);
-          return NextResponse.json({ inventoryData });
+          const data= await fetch(endpoint, operation);
+          const results = await data.json()
+          console.log(results)
+          return NextResponse.json({results})
         } catch (error) {
           console.log("Failed to do fetch request on 2nd option", error)
           return NextResponse.json({ err: error });
@@ -72,7 +71,7 @@ const makeOpenAIRequest = async (request) => {
         {
           role: "system",
           content:
-            "You will convert the following prompt to a simple command which will contain the command of what the user is trying to do ( either add delete search or update) and the item to do the command on. Return it as a javascript object, with keys being 0,1,2, 0 containing the command, 1, the value or amount to work with, and 2 the item the user is requesting us to operate with, if the prompt doesnt have a quantity just put an empty string, make sure to return a valid json string",
+            "You will convert the following prompt to a simple command which will contain the command of what the user is trying to do ( either add delete search or update) and the item to do the command on. Return it as a valid json string, with keys being 0,1,2. 0 will contain the command, 1 the value or amount to work with (if its spelled out put it as a number), and 2 the item the user is requesting us to operate with, if the prompt doesnt have a quantity just put an empty string, make sure to return a valid json string.",
         },
         {
           role: "user",
