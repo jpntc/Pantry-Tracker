@@ -38,7 +38,7 @@ export async function POST(req) {
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ data: parsedInput }),
           };
-          const endpoint = "./firebase_ops/";
+          const endpoint = "/firebase_ops/";
           const data = await fetch(endpoint, operation);
           const results = await data.json()
 
