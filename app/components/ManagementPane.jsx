@@ -31,6 +31,7 @@ const ManagementPane = () => {
       console.log("Successful API route calls and return to management tab.");
       console.log(response.status)
       if (response) {
+        try{
         if (response.status === 200) {
           console.log("response status is ok")
           const result = await response.json();
@@ -40,7 +41,6 @@ const ManagementPane = () => {
             return;
           }
           if (result.searched == "searched") {
-    
             setSearchedData(result);
             console.log(searchedData)
             setSearched(true);
@@ -54,6 +54,9 @@ const ManagementPane = () => {
           console.log("Error in processing this command", response.status);
           console.log(response.message);
         }
+      }catch(error){
+        console.log(error)
+      }
       }
     } catch (error) {
       console.log(error);
