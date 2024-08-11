@@ -38,7 +38,8 @@ export async function POST(req) {
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ data: parsedInput }),
           };
-          const endpoint = "/api/firebase_ops/";
+          const endpoint = process.env.Vercel_Base_Url + "/api/firebase_ops/";
+          console.log(endpoint)
           const data = await fetch(endpoint, operation);
           const results = await data.json()
 
