@@ -39,6 +39,7 @@ export async function POST(req) {
             body: JSON.stringify({ data: parsedInput }),
           };
           const endpoint = "/api/firebase_ops/";
+          console.log(endpoint)
           const data = await fetch(endpoint, operation);
           const results = await data.json()
 
